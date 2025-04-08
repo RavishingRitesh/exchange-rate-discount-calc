@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.xische.demo.model.request.DiscountCalculationRequest;
 import com.xische.demo.model.response.NetPayableResponse;
 import com.xische.demo.service.CalculateBillService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -28,8 +29,8 @@ public class CurrencyController {
    * @param request the request
    * @return the response entity
    */
-  @PostMapping("/calculate")
-  public ResponseEntity<NetPayableResponse> calculatePayable(@RequestBody DiscountCalculationRequest request) {
+  @PostMapping("/calculatePayable")
+  public ResponseEntity<NetPayableResponse> calculatePayable(@Valid @RequestBody DiscountCalculationRequest request) {
     return ResponseEntity.ok(billService.calculatePayableAmount(request));
   }
 }

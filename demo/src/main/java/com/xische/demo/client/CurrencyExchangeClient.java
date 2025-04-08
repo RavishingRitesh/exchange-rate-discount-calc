@@ -21,6 +21,9 @@ public class CurrencyExchangeClient {
   @Value("${exchange.api.key}")
   private String apiKey;
 
+  @Value("${exchange.api.url}")
+  private String apiUrl;
+
   /**
    * Gets exchange rate.
    *
@@ -29,7 +32,7 @@ public class CurrencyExchangeClient {
    * @return the exchange rate
    */
   public double getExchangeRate(String from, String to) {
-    String url = String.format("https://v6.exchangerate-api.com/v6/%s/latest/%s", apiKey, from);
+    String url = String.format(apiUrl, apiKey, from);
     ExchangeRateResponse response;
     try {
       response = restTemplate.getForObject(url, ExchangeRateResponse.class);

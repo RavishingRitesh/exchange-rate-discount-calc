@@ -18,6 +18,8 @@ public class CalculateBillService {
 
   private final CurrencyExchangeClient currencyExchangeClient;
 
+  private final DiscountCalculator discountCalculator;
+
   /**
    * Calculate payable amount net payable response.
    *
@@ -27,7 +29,7 @@ public class CalculateBillService {
   public NetPayableResponse calculatePayableAmount(DiscountCalculationRequest request) {
     double totalAmount = request.getItems().stream().mapToDouble(Item::getPrice).sum();
 
-    double discount = DiscountCalculator.calculateDiscount(request.getUser(), request.getItems(), totalAmount);
+    double discount = discountCalculator.calculateDiscount(request.getUser(), request.getItems(), totalAmount);
     double amountAfterDiscount = totalAmount - discount;
 
     double exchangeRate = currencyExchangeClient.getExchangeRate(request.getOriginalCurrency(),

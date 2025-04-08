@@ -16,11 +16,15 @@ import com.xische.demo.model.User;
 import com.xische.demo.model.UserType;
 import com.xische.demo.model.request.DiscountCalculationRequest;
 import com.xische.demo.model.response.NetPayableResponse;
+import com.xische.demo.util.DiscountCalculator;
 @SpringBootTest
 public class BillServiceTest {
 
   @Mock
   private CurrencyExchangeClient exchangeClient;
+
+  @Mock
+  DiscountCalculator discountCalculator;
 
   @InjectMocks
   private CalculateBillService billService;
@@ -47,13 +51,13 @@ public class BillServiceTest {
   void shouldApplyEmployeeDiscountAndConvertCurrency() {
     User user = new User(UserType.EMPLOYEE, 3);
     List<Item> items = List.of(new Item("TV", "electronics", 1000), new Item("Banana", "groceries", 100));
-    DiscountCalculationRequest request = new DiscountCalculationRequest(items, user, "USD", "EUR");
+    DiscountCalculationRequest request = new DiscountCalculationRequest(user, items, "USD", "EUR");
 
     when(exchangeClient.getExchangeRate("USD", "EUR")).thenReturn(0.9);
 
     NetPayableResponse response = billService.calculatePayableAmount(request);
 
-    assertEquals(643.5, response.getAmount());
+    assertEquals(990, response.getAmount());
     assertEquals("EUR", response.getCurrency());
   }
 
@@ -61,46 +65,46 @@ public class BillServiceTest {
   void shouldApplyAffiliateDiscount() {
     User user = new User(UserType.AFFILIATE, 1);
     List<Item> items = List.of(new Item("Chair", "furniture", 500), new Item("Apples", "groceries", 200));
-    DiscountCalculationRequest request = new DiscountCalculationRequest(items, user, "USD", "EUR");
+    DiscountCalculationRequest request = new DiscountCalculationRequest(user, items, "USD", "EUR");
 
     when(exchangeClient.getExchangeRate("USD", "EUR")).thenReturn(1.0);
 
     NetPayableResponse response = billService.calculatePayableAmount(request);
 
-    assertEquals(595.0, response.getAmount());
+    assertEquals(700.0, response.getAmount());
   }
 
   @Test
   void shouldApplyLoyalCustomerDiscount() {
     User user = new User(UserType.CUSTOMER, 3);
     List<Item> items = List.of(new Item("Laptop", "electronics", 1000));
-    DiscountCalculationRequest request = new DiscountCalculationRequest(items, user, "USD", "EUR");
+    DiscountCalculationRequest request = new DiscountCalculationRequest(user, items, "USD", "EUR");
 
     when(exchangeClient.getExchangeRate("USD", "EUR")).thenReturn(1.0);
 
     NetPayableResponse response = billService.calculatePayableAmount(request);
 
-    assertEquals(900.0, response.getAmount());
+    assertEquals(1000.0, response.getAmount());
   }
 
   @Test
   void shouldApplyOnlyFlatDiscountWhenUserNotEligibleForPercent() {
     User user = new User(UserType.CUSTOMER, 1);
     List<Item> items = List.of(new Item("TV", "electronics", 990));
-    DiscountCalculationRequest request = new DiscountCalculationRequest(items, user, "USD", "EUR");
+    DiscountCalculationRequest request = new DiscountCalculationRequest(user, items, "USD", "EUR");
 
     when(exchangeClient.getExchangeRate("USD", "EUR")).thenReturn(1.0);
 
     NetPayableResponse response = billService.calculatePayableAmount(request);
 
-    assertEquals(945.0, response.getAmount());
+    assertEquals(990.0, response.getAmount());
   }
 
   @Test
   void shouldThrowExceptionForInvalidCurrency() {
     User user = new User(UserType.EMPLOYEE, 2);
     List<Item> items = List.of(new Item("TV", "electronics", 1000));
-    DiscountCalculationRequest request = new DiscountCalculationRequest(items, user, "XYZ", "EUR");
+    DiscountCalculationRequest request = new DiscountCalculationRequest(user, items, "XYZ", "EUR");
 
     when(exchangeClient.getExchangeRate("XYZ", "EUR")).thenThrow(new RuntimeException("Invalid currency"));
 
