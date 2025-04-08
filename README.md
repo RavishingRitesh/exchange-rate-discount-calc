@@ -49,55 +49,52 @@ This Spring Boot application calculates the final payable amount for a bill afte
   "targetCurrency": "EUR"
 }
 
-**Response Structure:**
+Response (JSON):
 
 {
   "netPayableAmount": 170.45,
   "currency": "EUR"
 }
 
-**Authentication**
-All endpoints are secured. Use Basic Authentication.
-**Username:user
-Password:password**
+🔐 Authentication
+All endpoints are secured using Basic Authentication:
 
-**UML Class High Level Diagram**
+Username: user
 
-+-------------------+
-|      User         |
-+-------------------+
-| type              |
-| tenureInYears     |
-+-------------------+
+Password: password
 
-+-------------------+
-|      Item         |
-+-------------------+
-| name              |
-| category          |
-| price             |
-+-------------------+
+🧩 UML Class High-Level Diagram
+lua
+Copy
+Edit
++-------------------+           +-------------------+
+|      User         |           |      Item         |
++-------------------+           +-------------------+
+| type              |           | name              |
+| tenureInYears     |           | category          |
++-------------------+           | price             |
+                                +-------------------+
 
 +----------------------------+
-| DiscountService           |
+|     DiscountService        |
 +----------------------------+
 | calculateDiscount(...)     |
 +----------------------------+
 
 +----------------------------+
-| ExchangeRateService        |
+|   ExchangeRateService      |
 +----------------------------+
 | getExchangeRate(...)       |
 +----------------------------+
 
 +----------------------------+
-| BillingController          |
+|     BillingController      |
 +----------------------------+
 | calculateNetPayable(...)   |
 +----------------------------+
 
 +----------------------------+
-| AuthenticationConfig       |
+|   AuthenticationConfig     |
 +----------------------------+
 | security configuration     |
 +----------------------------+
